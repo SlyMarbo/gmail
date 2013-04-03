@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+// Email represents a single message, which may contain
+// attachments.
 type Email struct {
 	Subject, Body string
 	From string
@@ -19,6 +21,9 @@ type Email struct {
 	Attachments map[string][]byte
 }
 
+// Compose begins a new email, filling the subject and body,
+// and allocating memory for the list of recipients and the
+// attachments.
 func Compose(Subject, Body string) *Email {
 	out := new(Email)
 	out.Subject = Subject
@@ -28,6 +33,11 @@ func Compose(Subject, Body string) *Email {
 	return out
 }
 
+// Attach takes a filename and adds this to the message.
+// Note that since only the filename is stored (and not
+// its path, for privacy reasons), multiple files in
+// different directories but with the same filename and
+// extension cannot be sent.
 func (e *Email) Attach(Filename string) error {
 	b, err := ioutil.ReadFile(Filename)
 	if err != nil {
@@ -39,14 +49,17 @@ func (e *Email) Attach(Filename string) error {
 	return nil
 }
 
+// AddRecipient adds a single recipient.
 func (e *Email) AddRecipient(Recipient string) {
 	e.To = append(e.To, Recipient)
 }
 
+// AddRecipients adds one or more recipients.
 func (e *Email) AddRecipients(Recipients ...string) {
 	e.To = append(e.To, Recipients...)
 }
 
+// Send sends the email, returning any error encountered.
 func (e *Email) Send() error {
 	if e.From == "" {
 		return errors.New("Error: No sender specified. Please set the Email.From field.")
@@ -114,6 +127,7 @@ func (e *Email) Bytes() []byte {
 	buf.WriteString("Subject: " + e.Subject + "\n")
 	buf.WriteString("MIME-Version: 1.0\n")
 
+	// Boundary is used by MIME to separate files.
 	boundary := "f46d043c813270fc6b04c2d223da"
 
 	if len(e.Attachments) > 0 {
