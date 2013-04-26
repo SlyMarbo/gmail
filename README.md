@@ -28,6 +28,7 @@ func main() {
 ```
 
 Note:
+
 If you have problems with authentication, be sure to check your password settings. While
 developing the package, I had forgotten that I have application-specific passwords enabled
 on my Google account, so my account password wasn't working; I had to sign into my
