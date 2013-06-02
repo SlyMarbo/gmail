@@ -15,10 +15,10 @@ import (
 // attachments.
 type Email struct {
 	Subject, Body string
-	From string
-	Password string
-	To []string
-	Attachments map[string][]byte
+	From          string
+	Password      string
+	To            []string
+	Attachments   map[string][]byte
 }
 
 // Compose begins a new email, filling the subject and body,
@@ -43,7 +43,7 @@ func (e *Email) Attach(Filename string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	_, fname := filepath.Split(Filename)
 	e.Attachments[fname] = b
 	return nil
@@ -70,29 +70,29 @@ func (e *Email) Send() error {
 	if e.Password == "" {
 		return errors.New("Error: No password specified. Please set the Email.Password field.")
 	}
-	
+
 	auth := smtp.PlainAuth(
 		"",
 		e.From,
 		e.Password,
 		"smtp.gmail.com",
 	)
-	
+
 	conn, err := smtp.Dial("smtp.gmail.com:587")
 	if err != nil {
 		return err
 	}
-	
+
 	err = conn.StartTLS(&tls.Config{})
 	if err != nil {
 		return err
 	}
-	
+
 	err = conn.Auth(auth)
 	if err != nil {
 		return err
 	}
-	
+
 	err = conn.Mail(e.From)
 	if err != nil {
 		if strings.Contains(err.Error(), "530 5.5.1") {
@@ -100,14 +100,14 @@ func (e *Email) Send() error {
 		}
 		return err
 	}
-	
+
 	for _, recipient := range e.To {
 		err = conn.Rcpt(recipient)
 		if err != nil {
 			return err
 		}
 	}
-	
+
 	wc, err := conn.Data()
 	if err != nil {
 		return err
@@ -117,7 +117,7 @@ func (e *Email) Send() error {
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
