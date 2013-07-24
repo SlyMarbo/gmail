@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/smtp"
 	"path/filepath"
@@ -17,6 +18,7 @@ type Email struct {
 	Subject, Body string
 	From          string
 	Password      string
+	ContentType   string
 	To            []string
 	Attachments   map[string][]byte
 }
@@ -135,7 +137,10 @@ func (e *Email) Bytes() []byte {
 		buf.WriteString("--" + boundary + "\n")
 	}
 
-	buf.WriteString("Content-Type: text/plain; charset=utf-8\n")
+	if e.ContentType == "" {
+		e.ContentType = "text/plain; charset=utf-8"
+	}
+	buf.WriteString(fmt.Sprintf("Content-Type: %s\n", e.ContentType))
 	buf.WriteString(e.Body)
 
 	if len(e.Attachments) > 0 {
