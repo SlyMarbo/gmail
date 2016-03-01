@@ -85,7 +85,7 @@ func (e *Email) Send() error {
 		return err
 	}
 
-	err = conn.StartTLS(&tls.Config{})
+	err = conn.StartTLS(&tls.Config{ServerName: "smtp.gmail.com"})
 	if err != nil {
 		return err
 	}
