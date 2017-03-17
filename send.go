@@ -17,6 +17,7 @@ import (
 type Email struct {
 	Subject, Body string
 	From          string
+	Name          string
 	Password      string
 	ContentType   string
 	To            []string
@@ -128,6 +129,10 @@ func (e *Email) Bytes() []byte {
 
 	buf.WriteString("Subject: " + e.Subject + "\n")
 	buf.WriteString("MIME-Version: 1.0\n")
+
+	if e.Name != "" {
+		buf.WriteString(fmt.Sprintf("From: %s <%s>\n", e.Name, e.From))
+	}
 
 	// Boundary is used by MIME to separate files.
 	boundary := "f46d043c813270fc6b04c2d223da"
